@@ -1,7 +1,7 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 // Source: https://egghead.io/courses/react-fundamentals
-
 
 
 // .. two ways of components:
@@ -57,12 +57,26 @@ class App extends React.Component {
                     <AppInput update={this.update.bind(this)} />
                     <AppButton>I <AppHeart /> kaka maka.</AppButton>
                     <hr />
+                    <h2>event stuff</h2>
+                    <AppEvents update={this.update.bind(this)} />
+                    <hr />
+                    <h2>"higher order component"</h2>
+                    <AppRefComponent />
+                    <hr />
+                    <h2>component mounting stuff</h2>
+                    <AppMountingWrapper />
+                    <hr />
+                    <h2>component update checker / should update run ?</h2>
+                    <div id="makachecker">
+                    <AppUpdateChecker val={0} />
+                    </div>
+                    <hr />
+                    <h2>Array data stuff</h2>
+                    <AppDataStuff />
                 </div>
-                <h2>event stuff</h2>
-                <AppEvents update={this.update.bind(this)} />
                 <hr />
-                <h2>component reference stuff</h2>
-                <AppRefComponent />
+                <h2>Array data stuff</h2>
+                <AppHOC />
             </div>
         )
     }
@@ -180,6 +194,188 @@ class AppRefComponentInput extends React.Component {
         )
     }
 }
+
+//================================================================================
+// .. Use lifecycle - mounting
+class AppMounting extends React.Component {
+    constructor(){
+        super();
+        this.state = {val: 0}
+        this.update = this.update.bind(this)
+    }
+    update(e){
+        this.setState({val: this.state.val +1})
+    }
+
+    
+    componentWillMount () {
+        console.log('componentWillMount')
+        this.setState({m:2})
+    }
+   
+    render () {
+        console.log('render');
+        return (
+        <div>
+             <button onClick={this.update}>{this.state.val * this.state.m}</button>
+        </div>
+        )
+        
+    }
+
+    componentDidMount () {
+        console.log('componentDidMount');
+        console.log(ReactDOM.findDOMNode(this))
+        this.inc = setInterval(this.update, 500)
+    }    
+
+    componentWillUnmount() {
+        console.log('componentWillUnmount');
+        clearInterval(this.inc);
+    }
+}
+
+class AppMountingWrapper extends React.Component {
+    mount(){
+        ReactDOM.render(<AppMounting />, document.getElementById('a'))        
+    }
+    unmount(){
+        ReactDOM.unmountComponentAtNode(document.getElementById('a'))
+    }
+    render() {
+        return (
+            <div>
+               <button onClick={this.mount.bind(this)}>Mount</button> 
+               <button onClick={this.unmount.bind(this)}>UnMount</button>
+               <div id="a"></div>
+            </div>
+        );
+    }
+}
+
+
+//================================================================================
+// .. update render skip !
+class AppUpdateChecker extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {increasing: false}
+    }
+
+    update(){
+        ReactDOM.render(
+            <AppUpdateChecker val={this.props.val+1} />
+            ,
+            document.getElementById('makachecker')
+        )
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({increasing: nextProps.val > this.props.val})
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps.val % 5 === 0;
+    }
+
+    render() {
+        console.log('this.state.increasing:' + this.state.increasing)
+
+        return (
+            <div>
+                <button onClick={this.update.bind(this)}>{this.props.val}</button>
+            </div>
+        );
+    }
+}
+
+//================================================================================
+// .. data stuff / arrays
+class AppDataStuff extends React.Component {
+    constructor(){
+        super();
+        this.state = {items: []}
+    }
+    
+    componentWillMount () {
+        fetch('http://swapi.co/api/people/?format=json')
+        .then(response => response.json() )
+        .then( ({results: items}) => {this.setState({items})})
+    }
+    
+    filter(e){
+        this.setState({filter: e.target.value})
+    }
+
+    render() {
+        let items = this.state.items;
+        if (this.state.filter) {
+            items = items.filter( item=>item.name.toLowerCase().includes(this.state.filter.toLowerCase()))
+        }
+
+        return (
+            <div>
+                <input type="text" onChange={this.filter.bind(this)} />
+                { items.map(item=>
+                <h4 key={item.name}>{item.name}</h4>)
+                }
+            </div>
+        );
+    }
+}
+
+
+//================================================================================
+// .. component bridge / derived / extension .. "higher order component"
+
+const HOCer = (InnerComponent) => class extends React.Component {
+    constructor(){
+        super();
+        this.state = {count: 0}
+    }
+    update(){
+        this.setState({count: this.state.count+1})
+    }
+    componentWillMount () {
+        console.log('HOCer will mount')
+    }
+    render(){
+        return (
+            <InnerComponent 
+            {...this.props}
+            {...this.state}
+            update={this.update.bind(this)}
+            />
+        )
+    }
+    
+}
+
+class AppHOC extends React.Component {
+    render(){ return (<div>
+                <MyButton>ein bütton</MyButton>
+                <hr />
+                <MyHOCLabel>ün laibel</MyHOCLabel>
+            </div>
+    )}
+}
+
+
+const MyButton = HOCer((props) => 
+    <button onClick={props.update}>{props.children} - {props.count}</button> )
+
+class MyLabel extends React.Component{
+    componentWillMount () {
+        console.log('MyLabel will mount')
+    }
+    render(){
+        return <label onMouseMove={this.props.update}>{this.props.children} - {this.props.count}</label>
+    }
+}
+
+const MyHOCLabel = HOCer(MyLabel)
+
+
 
 
 export default App
