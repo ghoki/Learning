@@ -1,5 +1,8 @@
+/* eslint-disable */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
+import './style.css';
 
 // Source: https://egghead.io/courses/react-fundamentals
 
@@ -39,14 +42,16 @@ class App extends React.Component {
     }
 
     render () {
-        var txt = this.props.someTxt;
-        var num = this.props.someNum;
+        // var txt = this.props.someTxt;
+        // var num = this.props.someNum;
+        var txt = this.props.params.someTxt;
+        var num = this.props.params.someNum;        
         var hideStyle = {display: 'none'}
         return (
             //.. one dom element, but can have as many nested. 
             <div>
+                <h1>Hello Component {num} <AppHeart />: {txt}</h1>
                 <div style={hideStyle}>
-                    <h1>Hello Component {num} <AppHeart />: {this.props.someTxt}</h1>
                     <p>first rule: return only one dom element, with nested many. {txt}</p>
                     <hr />
                     <h2>Statestuff</h2>
@@ -82,19 +87,31 @@ class App extends React.Component {
     }
 }
 
-// .. declare App props
-App.propTypes = {
-    someTxt: React.PropTypes.string.isRequired,
-    someNum: React.PropTypes.number.isRequired,
-    customTxt(props, propName, component){
-        if (!(propName in props)){
-            return new Error(`Fucker ! missing ${propName}`)
-        }
-        if (props[propName].length<5){
-            return new Error(`Fucker ! that is way too short ${propName}`)
-        }
-    }
-}
+// App.propTypes = {
+//      params: React.PropTypes.array() .arrayOf({
+//             someTxt: React.PropTypes.string,
+//             someNum: React.PropTypes.number
+//         }
+//      ).isRequired 
+// }
+
+//.. not working due to routing !!
+// // .. declare App props
+// App.propTypes = {
+//     // .. wie auch immer man das mit routing implementiert  !?
+//     someTxt: React.PropTypes.string.isRequired,
+//     someNum: React.PropTypes.number.isRequired,
+//     //someTxt: React.PropTypes.string,
+//     //someNum: React.PropTypes.number,
+//     customTxt(props, propName, component){
+//         if (!(propName in props)){
+//             return new Error(`Fucker ! missing ${propName}`)
+//         }
+//         if (props[propName].length<5){
+//             return new Error(`Fucker ! that is way too short ${propName}`)
+//         }
+//     }
+// }
 // .. and defaults App props
 App.defaultProps = {
     someTxt: "no text defined for someTxt. But ok."
