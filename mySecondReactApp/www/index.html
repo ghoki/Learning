@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <!-- react inline , anstatt create-react-app variante -->
+    <!-- installed npm , somit diese cloud variante raus /*
+    <script src="https://fb.me/react-15.1.0.js"></script>
+    <script src="https://fb.me/react-dom-15.1.0.js"></script>
+    -->
+
+    <!-- JSX 2 Babel 4 js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.38/browser.js"></script>
+    
+    <meta charset="UTF-8">
+    <title>Hello World with React</title>
+</head>
+<body>
+    <div id="react-container"></div>
+<h1> kaka maka </h1>
+    <!-- "transpile" ! type babel nutzt babel-core/5.8.38/browser.js script im header 
+        .. JSX enabled, zur Laufzeit -->
+    <!-- REM (used webpack transpile file) <script type="text/babel" src="index.js"></script-->
+    <!-- besser ist es das ganze statisch abzulegen. ein "build" release bauen. -->
+    <script type="text/javascript" src="webpack/bundle.js"></script>
+
+    <script type="text/javascript" src="cs.js"></script>
+    <a href="javascript:testMyCode()"> was isch do loos? </a>
+
+    
+</body>
+</html>
