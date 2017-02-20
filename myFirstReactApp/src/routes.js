@@ -11,7 +11,7 @@ import About from './components/About';
 import NotFound from './components/NotFound';
 
 const Routes = (props) => (
-  <Router {...props}>
+  <Router history={browserHistory} {...props}>
     <Route path="/" component={Master}>
         <IndexRoute component={Default}/>
         <Route path="/app/:someNum/:someTxt" component={App} />
